@@ -18,7 +18,6 @@
     <!-- Video Background -->
     <div class="video-background-container">
         <video autoplay loop muted playsinline id="bgVideo">
-            <!-- CHANGED: Use a more reliable relative path -->
             <source src="./background-video.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -34,6 +33,11 @@
     <div class="filter-controls">
         <label for="basedModeCheckbox">Based Mode :</label>
         <input type="checkbox" id="basedModeCheckbox">
+    </div>
+
+    <div class="volume-controls">
+        <label for="volumeSlider">Volume :</label>
+        <input type="range" id="volumeSlider" min="0" max="100" value="100">
     </div>
 
     <main class="w-full max-w-2xl flex flex-col items-center">
