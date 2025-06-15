@@ -5,6 +5,7 @@ const gimmeJokeButton = document.getElementById('gimmeJokeButton');
 const loaderElement = document.getElementById('loader'); 
 const messageBox = document.getElementById('messageBox');
 const basedModeCheckbox = document.getElementById('basedModeCheckbox');
+const volumeSlider = document.getElementById('volumeSlider');
 
 // Modal Elements
 const warningModal = document.getElementById('warningModal');
@@ -140,55 +141,90 @@ function displayJoke(jokeData) {
     }
 }
 
+function setVolume(value) {
+    if (Tone && Tone.Destination) {
+        const volumeInDb = Tone.gainToDb(value / 100);
+        Tone.Destination.volume.value = volumeInDb;
+    }
+    volumeSlider.style.backgroundSize = `${value}% 100%`;
+}
+
 // --- Event Listeners ---
 function startAudioContext() {
     if (Tone.context.state !== 'running') {
-        Tone.start();
-        console.log("Audio context started.");
+        return Tone.start().then(() => {
+            console.log("Audio context started.");
+            initializeSounds();
+            setVolume(volumeSlider.value); 
+        });
     }
-    initializeSounds();
+    if (!synth) {
+        initializeSounds();
+        setVolume(volumeSlider.value);
+    }
+    return Promise.resolve();
 }
 
 gimmeJokeButton.addEventListener('click', () => {
-    startAudioContext();
-    playButtonClickSound();
-    gimmeJokeButton.style.animation = 'none';
-    void gimmeJokeButton.offsetWidth; 
-    gimmeJokeButton.style.animation = 'buttonBoing 0.3s ease-out';
-    fetchJoke(); 
+    startAudioContext().then(() => {
+        playButtonClickSound();
+        gimmeJokeButton.style.animation = 'none';
+        void gimmeJokeButton.offsetWidth; 
+        gimmeJokeButton.style.animation = 'buttonBoing 0.3s ease-out';
+        fetchJoke(); 
+    });
 });
 
 basedModeCheckbox.addEventListener('change', (event) => {
-    startAudioContext();
-    const isChecked = event.target.checked;
-    
-    if (isChecked && localStorage.getItem('basedWarningAccepted') !== 'true') {
-        event.preventDefault(); 
-        warningModal.classList.add('show');
-        playWarningSound();
-        return;
-    }
-
-    playToggleSound(isChecked);
-    localStorage.setItem('basedModeActive', isChecked);
-    fetchJoke(); 
+    startAudioContext().then(() => {
+        const isChecked = event.target.checked;
+        
+        if (isChecked) {
+            event.preventDefault();
+            warningModal.classList.add('show');
+            playWarningSound();
+            return;
+        } else {
+            playToggleSound(false);
+            localStorage.setItem('basedModeActive', false);
+            fetchJoke();
+        }
+    });
 });
 
 acceptWarningBtn.addEventListener('click', () => {
-    localStorage.setItem('basedWarningAccepted', 'true');
-    warningModal.classList.remove('show');
-    basedModeCheckbox.checked = true; 
-    playToggleSound(true);
-    localStorage.setItem('basedModeActive', true);
-    fetchJoke();
+    startAudioContext().then(() => {
+        warningModal.classList.remove('show');
+        basedModeCheckbox.checked = true;
+        playToggleSound(true);
+        localStorage.setItem('basedModeActive', true);
+        fetchJoke();
+    });
+});
+
+volumeSlider.addEventListener('input', (event) => {
+    const value = event.target.value;
+    startAudioContext().then(() => {
+        setVolume(value);
+    });
+    localStorage.setItem('jokeVolume', value);
 });
 
 // --- Initialization ---
 function initializeApp() {
-    const savedBasedMode = localStorage.getItem('basedWarningAccepted');
+    const savedBasedMode = localStorage.getItem('basedModeActive');
     if (savedBasedMode !== null) {
         basedModeCheckbox.checked = (savedBasedMode === 'true');
     }
+
+    const savedVolume = localStorage.getItem('jokeVolume');
+    let initialVolume = 100;
+    if (savedVolume !== null) {
+        initialVolume = parseInt(savedVolume, 10);
+    }
+    volumeSlider.value = initialVolume;
+    volumeSlider.style.backgroundSize = `${initialVolume}% 100%`;
+    
     jokeTextElement.innerHTML = 'Press the big button to get a joke!';
 }
 
