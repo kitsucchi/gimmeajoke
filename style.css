@@ -1,0 +1,294 @@
+:root {
+    --bg-color: #FFECB3; /* Fallback */
+    --header-bg-color: #FFB74D;
+    --card-bg-color: #FFFFFF;
+    --text-color: #BF360C;
+    --joke-text-color: #4E342E;
+    --button-bg-color: #009688;
+    --button-hover-bg-color: #00796B;
+    --button-text-color: #FFFFFF;
+    --accent-color: #FF7043;
+    --font-title: 'Luckiest Guy', cursive;
+    --font-body: 'Comic Neue', cursive;
+    --bg-blur-amount: 3px; /* CSS variable for blur */
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-color); 
+    color: var(--text-color);
+    position: relative;
+    overflow-x: hidden; 
+}
+
+/* Video Background Styling */
+.video-background-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+#bgVideo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Cover the area, don't distort */
+    filter: blur(var(--bg-blur-amount));
+    transition: filter 0.3s ease-out;
+}
+
+/* --- Modals and Popups --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    text-align: center;
+    max-width: 90%;
+    width: 500px;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+.modal-overlay.show .modal-content {
+    transform: scale(1);
+}
+
+.modal-title {
+    font-family: var(--font-title);
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.modal-body {
+    color: var(--joke-text-color);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* Other styles... */
+header, .filter-controls, main, #gimmeJokeButton, footer {
+     position: relative;
+     z-index: 1;
+}
+.joke-card {
+    background-color: rgba(255, 255, 255, 0.9); 
+}
+
+header {
+    background-color: var(--header-bg-color);
+    padding: 1.5rem 1rem; 
+}
+
+.site-title {
+    font-family: var(--font-title);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; 
+}
+
+.title-icon {
+    width: 40px; 
+    height: 40px;
+    fill: var(--accent-color); 
+}
+
+.filter-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 1rem; 
+    background-color: rgba(255, 255, 255, 0.8); 
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.filter-controls label {
+    font-family: var(--font-body);
+    font-weight: bold;
+    color: var(--text-color);
+    margin-right: 0.5rem;
+    font-size: 1.1em;
+}
+
+.filter-controls input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--button-bg-color); 
+    cursor: pointer;
+    border: 2px solid var(--text-color);
+}
+
+main { 
+    width: 100%; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.joke-card {
+    min-height: 250px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--joke-text-color);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.15); 
+    border: 3px dashed var(--accent-color); 
+    border-radius: 20px; 
+    animation: fadeInWobble 0.7s ease-out; 
+    width: 100%; 
+    max-width: 42rem; 
+}
+
+@keyframes fadeInWobble {
+    0% { opacity: 0; transform: translateY(20px) rotate(-5deg); }
+    60% { opacity: 1; transform: translateY(-10px) rotate(3deg); }
+    80% { transform: translateY(5px) rotate(-2deg); }
+    100% { opacity: 1; transform: translateY(0) rotate(0deg); }
+}
+
+.joke-card.new-joke-animation {
+    animation: none; 
+    animation: fadeInWobble 0.7s ease-out;
+}
+
+
+#jokeText .setup {
+    margin-bottom: 0.75rem;
+    font-size: 1.1em; 
+    color: #5D4037; 
+}
+
+#jokeText .delivery {
+    font-weight: 700; 
+    font-size: 1.25em; 
+    color: var(--text-color); 
+    display: inline-block; 
+    visibility: hidden; 
+    opacity: 0; 
+}
+
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(10px); } 
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.loader {
+    border: 4px solid #f3f3f3; 
+    border-top: 4px solid var(--accent-color); 
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.message-box { 
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1050; /* Higher than modal overlay */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+    font-weight: bold;
+}
+.message-box.show {
+    opacity: 1;
+    visibility: visible;
+}
+.message-box.error {
+    background-color: #FFCDD2; 
+    color: #C62828; 
+    border: 2px solid #C62828;
+}
+.message-box.info { 
+    background-color: #BBDEFB; 
+    color: #0D47A1; 
+    border: 2px solid #0D47A1;
+}
+.message-box.success {
+     background-color: #C8E6C9; 
+    color: #2E7D32; 
+    border: 2px solid #2E7D32;
+}
+
+#gimmeJokeButton, #acceptWarningBtn {
+    font-family: var(--font-title);
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    font-size: 1.6rem; 
+    padding: 0.8rem 2rem; 
+    border: 3px solid var(--button-hover-bg-color);
+    border-radius: 50px; 
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    transition: transform 0.1s ease-out, background-color 0.2s ease;
+}
+ #gimmeJokeButton:hover, #acceptWarningBtn:hover {
+    background-color: var(--button-hover-bg-color);
+    transform: translateY(-3px) scale(1.03); 
+}
+#gimmeJokeButton:active, #acceptWarningBtn:active {
+    transform: translateY(1px) scale(0.95); 
+    animation: buttonBoing 0.3s ease-out;
+}
+
+@keyframes buttonBoing { 
+    0% { transform: scale(1); }
+    50% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+}
+
+footer { 
+    position: relative;
+    z-index: 1;
+}
+footer p {
+    font-family: var(--font-body);
+    color: #FFFFFF;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.25rem 0.75rem;
+    border-radius: 5px;
+    display: inline-block; 
+}
